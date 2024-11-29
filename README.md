@@ -1,2 +1,3 @@
 # DSCI 100: Group 11 Project 
-Ishita Sharma, Eric Haung, Yunfeng Bu, Andrew Liu
+Authors: 
+Ishita Sharma (66518101), Eric Haung, Yunfeng Bu, Andrew Liu
