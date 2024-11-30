@@ -1,0 +1,49 @@
+library(tidyverse)
+library(scales)
+library(ggplot2)
+library(readr)
+
+url1<-"https://drive.google.com/uc?export=download&id=14O91N5OlVkvdGxXNJUj5jIsV5RexhzbB"
+url2<-"https://drive.google.com/uc?export=download&id=1Mw9vW0hjTJwRWx0bDXiSpYsO3gKogaPz"
+
+
+session_data <- read_csv(url1)
+session_data
+players_data<-read_csv(url2)
+players_data
+
+session_data_wrangle<-session_data|>             
+                      mutate(start_time=dmy_hm(start_time),
+                      end_time=dmy_hm(end_time)
+                    )|>
+              filter(!is.na(start_time)&!is.na(end_time))|>
+              mutate(Duration=as.numeric(end_time-start_time,unit="mins")
+                    )|>
+              group_by(hashedEmail)|>
+              mutate(frequency = n(),
+                     total_duration=sum(Duration,na.rm=TRUE)
+                    ) |>
+              ungroup()
+
+players_data_wrangle<-players_data|>
+                      select(-individualId,-organizationName)|>
+                      mutate(experience = as.factor(experience),
+                             subscribe = as.factor(subscribe),
+                             gender = as.factor(gender))|>
+                      filter(!is.na(experience) & !is.na(played_hours) & !is.na(age))
+
+
+
+         combined_data <- session_data_wrangle|>
+                     left_join(players_data_wrangle, by = "hashedEmail")
+
+  
+          combined_data_1<-combined_data|>
+               distinct(hashedEmail,start_time,.keep_all = TRUE)|>
+               select(played_hours, name, gender, age,Duration,frequency, total_duration, experience, subscribe)|>
+               distinct(name,.keep_all = TRUE)|>
+               select(played_hours,gender, age,experience)
+
+
+  
+combined_data_1
